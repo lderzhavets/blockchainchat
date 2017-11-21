@@ -1,0 +1,90 @@
+<html> 
+   <head>
+   	<meta charset="utf-8">   
+   	<script type="text/javascript" src="ajax.js"></script>	
+   </head>
+
+   <script type="text/javascript">
+   	var socket_port = 1111;
+
+		var WebSocketMessageType = {
+			CREATE_BLOCK : 0,
+			ADD_PEER : 1
+		}
+
+   	window.onload = () =>{
+   		
+
+   		document.getElementById("sendPort").onclick = () => {
+   			socket_port = document.getElementById("port").value
+
+				var sendData = {
+					"socket_port" : socket_port
+				}
+
+				ajaxPost("/connectWSClient", JSON.stringify(sendData), function(text){
+					connectToNode(socket_port)
+				});
+   		}
+
+   		
+   	}
+
+   	function connectToNode(port) {
+   		
+   		var socket = new WebSocket("ws://" + window.location.hostname + ":" + socket_port)
+
+   		socket.onmessage = (res) => {
+   			console.log(JSON.parse(res.data).data)
+   		}
+
+   		document.getElementById("sendMsg").onclick = () =>{
+   			socket.send(JSON.stringify({
+   						type: WebSocketMessageType.CREATE_BLOCK,
+   						data:  document.getElementById("mess").value
+   					}))
+   		}
+
+   		document.getElementById("sendPeer").onclick = () =>{
+   			socket.send(JSON.stringify({
+   						type: WebSocketMessageType.ADD_PEER,
+   						data:  document.getElementById("peer").value
+   					}))
+   		}
+   	}
+
+   </script>
+
+   <body ng-app="forumApp">  
+
+   	<div style="width: 1000px;">
+	   	
+			<div style="float: left;">
+	   		<label>Port :</label>
+	   		<input id="port"/>
+	   		<button id="sendPort"> Connect</button>	
+	   	</div>
+	   	<div id="connected"></div>
+	   	<br>
+	   	<br>
+
+	   	<div style="float: left;">
+	   		<label>Create message :</label>
+	   		<input id="mess"/>
+	   		<button id="sendMsg"> Send</button>	
+	   	</div>
+
+	   	<div style="float: right;">
+	   		<label>Add peer :</label>
+	   		<input id="peer"/>
+	   		<button id="sendPeer"> Send</button>	
+	   	</div>
+   	</div>
+   	
+
+   </body>
+
+
+
+</html>  
+
